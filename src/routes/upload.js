@@ -30,7 +30,7 @@ router.post("/file/upload", upload.single("file"), (req,res)=>{
 
     if(req.file === undefined) return res.send("Plz upload file")
 
-    const url = `http://localhost:3003/image/${req.file.filename}`
+    const url = `${req.file.filename}`
 
     return res.send(url)
 })
