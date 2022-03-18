@@ -84,7 +84,7 @@ routes.get('/product/:pid', async(req, res)=>{
         const product =await Products.findById(req.params.pid)
         if(!product){
             res.send("No product")
-            // throw new Error("No Product searching for")
+           
             
         }
         res.send(product.toObject())

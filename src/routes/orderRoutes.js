@@ -73,12 +73,12 @@ routes.post('/user/order', auth, async (req, res) => {
 })
 
 //change status of order
-routes.patch('/user/order/:id', async (req, res)=>{
+routes.patch('/user/order/:oid', async (req, res)=>{
     
 
     try{
-        console.log(req.body.status)
-        const order = await orders.findOneAndUpdate({ownerID: req.params.id}, {status: req.body.status})
+        const user = await userProfile.findOne({authID:req.auth._id})
+        const order = await orders.findOneAndUpdate({ownerID: user._id, _id:req.params.oid }, {status: req.body.status})
         res.send(order)
 
     }catch(e){

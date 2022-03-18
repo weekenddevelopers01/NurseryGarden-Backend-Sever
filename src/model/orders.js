@@ -3,7 +3,7 @@ const UserProfile = require('../model/userProfile')
 // const orderItem = require('../model/orderItems')
 const products = require('../model/products')
 const validator = require('validator')
-const STATUS = ["Order placed", "Order Accepted", "Order Packed", "Order Couriered", "Order Cancelled"]
+const STATUS = ["Order placed", "Order Accepted", "Order Packed", "Order Dispacted", "Order Cancelled", "Order Delivered"]
 
 const TABLE_NAME = "orders"
 
