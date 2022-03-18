@@ -47,7 +47,7 @@ routes.post('/product', async(req, res)=>{
 routes.post('/product/image/:pid', upload.single('file'), async(req,res)=>{
     // const buffer = await sharp(req.file.buffer).toBuffer()
     
-    const image = `${process.env.url}/image/${req.file.filename}`
+    const image = `${req.file.filename}`
 
     console.log(image)
     req.params.pid
@@ -66,9 +66,9 @@ routes.post('/product/image/:pid', upload.single('file'), async(req,res)=>{
 })
 
 
-routes.get('/product/image/:pid', async(req,res)=>{
+routes.get('/product/image/:oid', async(req,res)=>{
     try{
-        const user =await Products.findById(req.params.pid)
+        const user =await Products.findById(req.params.oid)
         
         res.send(user.image)
     }catch(e){

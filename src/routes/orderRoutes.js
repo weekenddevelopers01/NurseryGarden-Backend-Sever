@@ -104,6 +104,25 @@ routes.get('/user/order',auth, async(req, res)=>{
 
 })
 
+
+
+routes.get('/user/order/:id',auth, async(req,res)=>{
+
+    try{
+        const user = await UserProfile.findOne({authID: req.auth._id})
+        const order = await orders.findOne({ownerID: user._id, _id:req.params.id})
+
+        if(!order){
+            return new Error("No order found")
+        }
+        res.send(order)
+
+    }catch(e){
+
+    }
+
+
+})
 //get all order for admin
 routes.get('/order', async(req, res)=>{
     const orderList = await orders.find();
