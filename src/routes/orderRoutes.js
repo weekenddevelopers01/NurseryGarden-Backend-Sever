@@ -45,8 +45,12 @@ routes.post('/user/order', auth, async (req, res) => {
         }
 
         if(isOutOfStock){
-            res.send({error: "One of items out of stock"})
-        }else{
+            throw new Error("One of items out of stock")
+        }else if(grandTotal > 25000){
+            throw new Error("Order Price can't exceed more than 25000")
+        }
+        
+        else{
             
             
             for(const prod of productlist){
@@ -68,21 +72,48 @@ routes.post('/user/order', auth, async (req, res) => {
         }
 
     } catch (e) {
-        res.send(e)
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 })
 
 //change status of order
-routes.patch('/user/order/:oid', async (req, res)=>{
+routes.patch('/user/order/:oid',auth, async (req, res)=>{
     
 
     try{
         const user = await userProfile.findOne({authID:req.auth._id})
-        const order = await orders.findOneAndUpdate({ownerID: user._id, _id:req.params.oid }, {status: req.body.status})
+        const order = await orders.findOneAndUpdate({ownerID: user._id, _id:req.params.oid }, {status: req.body.status, isCancelled:true})
+        console.log(order.status)
         res.send(order)
 
     }catch(e){
-        res.send(e)
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
+    }
+})
+
+routes.patch('/order/status/:oid', async(req,res)=>{
+        let isDelivered= false;
+    try{
+        if(req.body.status === "Order Delivered"){
+            isDelivered= true;
+        }
+        const order = await orders.findOneAndUpdate({ _id:req.params.oid }, {status: req.body.status, isDelivered: isDelivered})
+        console.log(req.status+ isDelivered)
+        res.send(order)
+    }catch(e){
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 })
 
@@ -99,7 +130,11 @@ routes.get('/user/order',auth, async(req, res)=>{
         }
         res.send(productList)
     }catch(e){
-        res.send(e)
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 
 })
@@ -118,6 +153,11 @@ routes.get('/user/order/:id',auth, async(req,res)=>{
         res.send(order)
 
     }catch(e){
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
 
     }
 
@@ -128,12 +168,39 @@ routes.get('/order', async(req, res)=>{
     const orderList = await orders.find();
 
     try{
-        if(!orderList){ return res.send('No orders found')}
+        if(!orderList){ throw new Error('No orders found')}
         
         res.send(orderList)
     }catch(e){
-        res.send(e)
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
+})
+
+
+routes.get('/order/:id', async(req,res)=>{
+    const id = req.params.id
+
+    try{
+        const order = await orders.findById({_id:id})
+        if(!order){
+          throw new Error("Order Not found")  
+        }
+
+        res.send(order)
+
+
+    }catch(e){
+        const error ={
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
+    }
+
 })
 
 

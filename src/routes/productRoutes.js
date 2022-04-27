@@ -30,7 +30,7 @@ const routes = new express()
 //Add product
 routes.post('/product', async(req, res)=>{
     const product = new Products(req.body)
-    
+    console.log("enterd here")
     try{
         await product.save()
         res.send(product)
@@ -39,14 +39,15 @@ routes.post('/product', async(req, res)=>{
             statusCode:400,
             message: e.message
         }
-        res.send(error).status(400)
+        console.log(e)
+        res.status(400).send(error)
     }
 })
 
 //Upload Product image
 routes.post('/product/image/:pid', upload.single('file'), async(req,res)=>{
     // const buffer = await sharp(req.file.buffer).toBuffer()
-    
+    console.log("sdfdsfssdf")
     const image = `${req.file.filename}`
 
     console.log(image)
@@ -60,7 +61,9 @@ routes.post('/product/image/:pid', upload.single('file'), async(req,res)=>{
             statusCode:400,
             message: e.message
         }
-        res.send(error).status(400)
+        console.log(e)
+        // throw new Error(e)
+        res.staus(400).send(error)
     }
 
 })
@@ -72,7 +75,11 @@ routes.get('/product/image/:oid', async(req,res)=>{
         
         res.send(user.image)
     }catch(e){
-        res.send(e).status(400)
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 })
 
@@ -90,7 +97,11 @@ routes.get('/product/:pid', async(req, res)=>{
         res.send(product.toObject())
 
     }catch(e){
-        res.send(e);
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 
 })
@@ -105,7 +116,11 @@ routes.get('/products', async(req, res)=>{
         }
         res.send(products)
     }catch(e){
-        res.send(e)
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 })
 
@@ -113,7 +128,7 @@ routes.get('/products', async(req, res)=>{
 routes.get('/products/wishlist',auth,async(req,res)=>{
     try{
         if(!req.auth.isProfiled){
-            res.send('Please complete yur profile')
+            throw new Error('Please complete yur profile')
         }
         const user =await UserProfile.findOne({authID:req.auth._id})
         let wishlist = []
@@ -139,7 +154,7 @@ routes.get('/products/cartlist',auth,async(req,res)=>{
     try{
 
         if(!req.auth.isProfiled){
-            res.send('Please complete yur profile')
+            throw new Error('Please complete yur profile')
         }
         const user =await UserProfile.findOne({authID:req.auth._id})
         let cartlist = new Array()
@@ -183,11 +198,16 @@ routes.get('/products/cartlist',auth,async(req,res)=>{
 //Update product
 routes.patch('/product/:id', async(req, res)=>{
     try{
+        // console.log("jere")
         await Products.findByIdAndUpdate({_id: req.params.id}, req.body, {new:false, runValidators:true})
         const product = await Products.findById(req.params.id)
         res.send(product)
     }catch(e){
-        res.send(e)
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 })
 
@@ -198,10 +218,14 @@ routes.delete('/product/:id', async(req, res)=>{
         if(!product){
             throw new Error("product NOt found")
         }
-        await product.remove()
-        res.send("product removed")
+        const p = await product.remove()
+        res.send(p)
     }catch(e){
-        res.send(e)
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 
 

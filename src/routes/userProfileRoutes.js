@@ -15,7 +15,7 @@ const products = require('../model/products')
 routes.post("/user/profile", auth, async(req, res)=>{
     try{
         const auth = req.auth
-        if(!auth){ return res.send("Unauthorized.....!")}
+        if(!auth){ throw new Error("Unauthorized.....!")}
         const token = req.token
         req.body.authID = auth._id
         const userProfile = new UserProfile(req.body)
@@ -35,7 +35,7 @@ routes.post("/user/profile", auth, async(req, res)=>{
 routes.get("/user/profile", auth,async(req, res)=>{
 
     if(!req.auth.isProfiled){
-        res.send('Please complete your profile')
+        throw new Error('Please complete your profile')
     }
     const user = await UserProfile.findOne({authID:req.auth._id})
     try{
@@ -56,7 +56,7 @@ routes.patch("/user/profile", auth, async(req, res)=>{
     
     try{
         if(!req.auth.isProfiled){
-            res.send('Please complete yur profile')
+            throw new Error('Please complete yur profile')
         }
         await UserProfile.findOneAndUpdate({authID:req.auth._id}, req.body, {new:false, runValidators:true})
         const updated = await UserProfile.findOne({authID:req.auth._id})
@@ -74,7 +74,7 @@ routes.patch("/user/profile", auth, async(req, res)=>{
 routes.delete("/user/profile", auth, async(req, res)=>{
 
     if(!req.auth.isProfiled){
-        res.send("Plz complete Your Profile")
+        throw new Error("Plz complete Your Profile")
     }
     const user = await UserProfile.findOne(req.auth._id)
     try{
@@ -85,7 +85,10 @@ routes.delete("/user/profile", auth, async(req, res)=>{
         await user.remove()
         res.send("User profile deleted")
     }catch(e){
-        res.status(404).send("Not found")
+        const error ={
+            StatusCode:404, message:e.message
+        }
+        res.status(400).send(error)
     }
 })
 
@@ -98,12 +101,12 @@ routes.delete("/user/profile", auth, async(req, res)=>{
 //Add cart items
 routes.patch("/user/cart", auth, async(req, res)=>{
     if(!req.auth.isProfiled){
-       return res.send("Plz complete Your Profile")
+       throw new Error("Plz complete Your Profile")
     }
     const user = await UserProfile.findOne({authID: req.auth._id})
     try{
         if(!user){
-            return res.send("User Not found")
+            throw new Error("User Not found")
         }
         let isExist = false
         user.cartItems.forEach(cart =>{
@@ -140,13 +143,16 @@ routes.patch("/user/cart", auth, async(req, res)=>{
 //remove cart items
 routes.delete("/user/cart/:cid",auth, async(req,res)=>{
     if(!req.auth.isProfiled){
-        return res.send("Plz complete Your Profile")
+        throw new Error("Plz complete Your Profile")
     }
     try{
         await UserProfile.updateOne({authID:req.auth._id},{$pull:{cartItems:{cartItem: req.params.cid}}})
         res.send(await UserProfile.findOne({authID:req.auth._id}))
     }catch(e){
-        res.send(e)
+        const error ={
+            StatusCode:404, message:e.message
+        }
+        res.status(400).send(error)
     }
 })
 
@@ -154,7 +160,7 @@ routes.delete("/user/cart/:cid",auth, async(req,res)=>{
 routes.post("/user/cart/:op/:cid", auth, async(req, res)=>{
     const op = req.params.op;
     
-    if(!req.auth.isProfiled){ res.send("Plz complete Your Profile") }
+    if(!req.auth.isProfiled){ throw new Error("Plz complete Your Profile") }
     try{
 
         const user = await UserProfile.findOne({authID:req.auth._id})
@@ -245,18 +251,21 @@ routes.patch("/user/wishlist", auth, async(req, res)=>{
 
 //remove wishList items
 routes.delete("/user/wishlist/:cid", auth, async(req, res)=>{
-    if(!req.auth.isProfiled){ res.send("Plz complete Your Profile") }
+    if(!req.auth.isProfiled){ throw new Error("Plz complete Your Profile") }
     try{
         await UserProfile.findOneAndUpdate({authID:req.auth._id}, {$pull:{wishListItems:{wishListItem: req.params.cid}}})
         res.send( await UserProfile.findOne({authID:req.auth._id}))
     }catch(e){
-        res.send(e)
+        const error ={
+            StatusCode:404, message:e.message
+        }
+        res.status(400).send(error)
     }
 })
 
 //Move Item for wishlist to cart
 routes.post('/user/wishlist',auth, async(req, res)=>{
-    if(!req.auth.isProfiled){ res.send("Plz complete Your Profile") }
+    if(!req.auth.isProfiled){ throw new Error("Plz complete Your Profile") }
     try{
 
         let isExist = false
@@ -277,7 +286,10 @@ routes.post('/user/wishlist',auth, async(req, res)=>{
 
         res.send(await UserProfile.findOne({authID:req.auth._id}))
     }catch(e){
-        res.send(e)
+        const error ={
+            StatusCode:404, message:e.message
+        }
+        res.status(400).send(error)
     }
 })
 
@@ -319,7 +331,7 @@ routes.get('/user/address', auth, async(req, res)=>{
 routes.delete('/user/address/:aid', auth, async(req, res)=>{
     
     try{
-        if(!req.auth.isProfiled){res.send("Plz complete Your profile")}
+        if(!req.auth.isProfiled){throw new Error("Plz complete Your profile")}
         await UserProfile.updateOne({authID: req.auth._id},{$pull : {addressList:{_id:req.params.aid}}})
         res.send(await UserProfile.findOne(req.auth._id))
     }catch(e){

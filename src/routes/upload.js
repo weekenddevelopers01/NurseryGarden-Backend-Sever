@@ -42,7 +42,11 @@ router.get("/image/:filename", async(req, res)=>{
         var readstream = gridfsBucket.openDownloadStream(file._id);
         readstream.pipe(res);
     }catch(e){
-        res.send("cannot get"+e.message)
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 })
 
@@ -52,7 +56,11 @@ router.delete("/file/:filename", async(req,res)=>{
         await gfs.files.deleteOne({filename:req.params.filename})
         res.send("success")
     }catch{
-        res.send('errro')
+        const error = {
+            statusCode:400,
+            message: e.message
+        }
+        res.status(400).send(error)
     }
 })
 

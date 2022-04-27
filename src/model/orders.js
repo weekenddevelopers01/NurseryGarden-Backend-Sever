@@ -3,7 +3,7 @@ const UserProfile = require('../model/userProfile')
 // const orderItem = require('../model/orderItems')
 const products = require('../model/products')
 const validator = require('validator')
-const STATUS = ["Order placed", "Order Accepted", "Order Packed", "Order Dispacted", "Order Cancelled", "Order Delivered"]
+const STATUS = ["Order placed", "Order Accepted", "Order Packed", "Order Dispatched", "Order Cancelled", "Order Delivered"]
 
 const TABLE_NAME = "orders"
 
@@ -57,6 +57,11 @@ const orderItem = new mongoose.Schema(
 
 const address = new mongoose.Schema(
   {
+
+    name:{
+        type: String,
+        trim: true
+    },
     address:{
         type: String,
         trim: true
@@ -119,6 +124,16 @@ const ordersSchema = new mongoose.Schema(
             type: String,
             required: true,
             emum: STATUS
+        },
+        isDelivered:{
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        isCancelled:{
+            type: Boolean,
+            required: true,
+            default: false 
         },
         orderItems : [orderItem],
         billingAddress : address
