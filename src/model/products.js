@@ -54,6 +54,21 @@ const productsSchema = mongoose.Schema(
             type: Number,
             required: true
         },
+        isIndoor:{
+            type:Boolean,
+            required: true,
+            default: false
+        },
+        isOutdoor:{
+            type:Boolean,
+            required: true,
+            default: false 
+        },
+        isVege:{
+            type:Boolean,
+            required: true,
+            default: false 
+        },
         productImage:{
             data: String,
         }
