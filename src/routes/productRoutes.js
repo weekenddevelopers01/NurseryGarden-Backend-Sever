@@ -48,7 +48,7 @@ routes.post('/product', async(req, res)=>{
 routes.post('/product/image/:pid', upload.single('file'), async(req,res)=>{
     // const buffer = await sharp(req.file.buffer).toBuffer()
     console.log("sdfdsfssdf")
-    const image = process.env.url+'/'+`${req.file.filename}`
+    const image = process.env.url+'/image/'+`${req.file.filename}`
 
     console.log(image)
     req.params.pid
