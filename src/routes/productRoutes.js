@@ -176,12 +176,7 @@ routes.get('/products/cartlist',auth,async(req,res)=>{
             }
 
         }
-       
-        // user.cartItems.forEach(element => {
-        //     cartlist.push(element.cartItem)
-        // });
-
-        // const productlist = await Products.find({_id:{$in:cartlist}})
+    
         
         res.send(cartlist)
 
